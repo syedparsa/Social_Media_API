@@ -1,6 +1,6 @@
 # Social_Media_API
 
-This API is created with the FAST framework which has many cool features like auto-update for the API documentation 
+This API is created with the FASTAPI framework which has many cool features like auto-update for the API documentation 
 
 # Operations supported in the Social_media API  
 - Authentication
