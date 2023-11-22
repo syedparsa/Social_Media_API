@@ -1,68 +1,50 @@
 import json
 import time
-from typing import Optional
+
 from fastapi import Body, Depends, FastAPI, Response, status , HTTPException
-from pydantic import BaseModel
-from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from sqlalchemy.orm import Session
 from .database import  engine, get_db
-from . import models
-from app.models import Post
-
+from . import models, schemas
 
 
 
 models.Base.metadata.create_all(bind=engine)
-
-
-
 app = FastAPI()
 
 
 
-
-class POST(BaseModel):
-    title: str
-    content: str
-    published: bool = True
-    rating: Optional[int] = None
-
-while True:
-    try:
-        connection = psycopg2.connect(host = 'localhost', database = 'social_media_api_db',
-                                  user = 'postgres', password= 'syed', cursor_factory=RealDictCursor )
-        cursor = connection.cursor()
-        print('Datebase connection was successful')
-        break
-    except Exception as error:
-        print('connection to the database failed')
-        print('Errot:',error)
-        time.sleep(5)
+# while True:
+#     try:
+#         connection = psycopg2.connect(host = 'localhost', database = 'social_media_api_db',
+#                                   user = 'username', password= 'password', cursor_factory=RealDictCursor )
+#         cursor = connection.cursor()
+#         print('Datebase connection was successful')
+#         break
+#     except Exception as error:
+#         print('connection to the database failed')
+#         print('Errot:',error)
+#         time.sleep(5)
 
 
 
-my_post_storage = [{'title':'this is title one ', 'content':'this is the content', 'id':1}]
+# my_post_storage = [{'title':'this is title one ', 'content':'this is the content', 'id':1}]
 
 
-def find_post_by_id (id):
-    for post in my_post_storage:
-        if post['id'] == id:
-            return post
+# def find_post_by_id (id):
+#     for post in my_post_storage:
+#         if post['id'] == id:
+#             return post
 
 
 
-def find_post_index(id):
-    for index,post in enumerate(my_post_storage):
-        if post['id'] == id:
-             return index
+# def find_post_index(id):
+#     for index,post in enumerate(my_post_storage):
+#         if post['id'] == id:
+#              return index
 
 
-@app.get('/sqlalchemy')
-def Test_post(db: Session = Depends(get_db)):
-    post =  db.query(Post).all()
-    return {'Status': post}
 
 
 
@@ -73,7 +55,7 @@ def read_root():
 
 @app.get('/posts')
 def get_posts(db: Session = Depends(get_db)):
-    post =  db.query(Post).all()
+    post =  db.query(models.Post).all()
     return {'All_Posts': post}
 
 
@@ -83,7 +65,7 @@ def get_posts(db: Session = Depends(get_db)):
 
 
 @app.post('/posts', status_code=status.HTTP_201_CREATED)
-def create_post(post: POST, db: Session = Depends(get_db)):
+def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
 # usign ORM to create a new post in the DB using sqlalchemy
 
 
@@ -105,17 +87,17 @@ def create_post(post: POST, db: Session = Depends(get_db)):
     # return f'newpost:{post_dict}'
 
 
-@app.get('/posts/latest')
-def get_latest_post():
-    post = my_post_storage[len(my_post_storage)-1]
-    return {'lates_post':post}
+# @app.get('/posts/latest')
+# def get_latest_post():
+#     post = my_post_storage[len(my_post_storage)-1]
+#     return {'lates_post':post}
 
 
 @app.get('/posts/{id}')
 def get_post(id: int, db: Session = Depends(get_db)):
 # Updated code using ORM instead if direct db server
 
-    post_by_id = db.query(Post).filter(models.Post.id == str(id)).first()
+    post_by_id = db.query(models.Post).filter(models.Post.id == str(id)).first()
     if not post_by_id:
         raise HTTPException(status_code=404, detail=f'Post with id:{id} not found')
     return {'Choosen_post': post_by_id}
@@ -151,7 +133,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     # return {'deleted_post':deleted_post}
 
 @app.put('/posts/{id}')
-def update_post(id:int, post:POST, db: Session = Depends (get_db) ):
+def update_post(id:int, post:schemas.PostBase, db: Session = Depends (get_db) ):
 #   Updated code using ORM instead if direct db server
 
     post_query = db.query(models.Post).filter(models.Post.id == id )
