@@ -6,7 +6,7 @@ from psycopg2.extras import RealDictCursor
 from sqlalchemy.orm import Session
 from .database import  engine, get_db
 from . import models, schemas, utils
-from .routers import post,users
+from .routers import post,users, auth
 
 
 
@@ -18,6 +18,8 @@ app = FastAPI()
 
 app.include_router(post.router)
 app.include_router(users.router)
+app.include_router(auth.router)
+
 
 @app.get("/")
 def read_root():

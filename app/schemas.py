@@ -34,3 +34,10 @@ class UserResponse(BaseModel):
     email: EmailStr
     class Config:
         orm_mode = True
+
+class Userlogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class UserloginREsponse(BaseModel):
+    EmailStr
