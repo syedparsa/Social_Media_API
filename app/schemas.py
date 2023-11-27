@@ -14,6 +14,7 @@ class PostCreate(PostBase):
 
 class PostResponse(PostBase):
     id:int
+    owner_id: int
     created_at: datetime
     class Config:
         orm_mode = True
@@ -40,4 +41,11 @@ class Userlogin(BaseModel):
     password: str
 
 class UserloginREsponse(BaseModel):
-    EmailStr
+    email: EmailStr
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+        id: Optional[str] = None
