@@ -1,11 +1,7 @@
 
-from typing import List
-from fastapi import Depends, FastAPI, Response, status , HTTPException
-import psycopg2
-from psycopg2.extras import RealDictCursor
-from sqlalchemy.orm import Session
+from fastapi import  FastAPI
 from .database import  engine, get_db
-from . import models, schemas, utils
+from . import models
 from .routers import post,users, auth
 
 
