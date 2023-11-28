@@ -14,9 +14,9 @@ from .config import settings
 
 # to get a string like this run:
 # openssl rand -hex 32
-SECRET_KEY = {settings.SECRET_KEY}
-ALGORITHM = {settings.ALGORITHM}
-ACCESS_TOKEN_EXPIRE_MINUTES = {settings.ACCESS_TOKEN_EXPIRE_MINUTES}
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 
