@@ -42,7 +42,7 @@ class PostResponse(PostBase):
     class Config:
         orm_mode = True
 
-class PostOut(BAs):
+class PostOut(BaseModel):
     post: PostResponse
     votes: int
     class Config:
