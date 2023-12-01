@@ -6,8 +6,8 @@ from .routers import post,users, auth, votes
 
 
 
-
-models.Base.metadata.create_all(bind=engine)
+#un-comment the next line if don't want to use the db migration tool
+#models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 

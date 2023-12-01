@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from fastapi import Depends, FastAPI, Response, status , HTTPException, APIRouter
 from sqlalchemy.orm import Session
+from sqlalchemy import  func
 from app.database import  engine, get_db
 from app import Oauth2, models, schemas
 
@@ -15,16 +16,22 @@ router = APIRouter(
 
 
 
-@router.get('/', response_model= List [schemas.PostResponse])
+@router.get('/',response_model= List [schemas.PostOut])
 def get_posts(db: Session = Depends(get_db),get_current_user:int = Depends(Oauth2.get_current_user), limit:int = 15, skip:int = 0, search:Optional[str]  = ""):
     post =  db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
-    return post
+
+
+
+    results = db.query(models.Post, func.count(models.Votes.post_id).label('votes')).join(
+        models.Votes, models.Post.id == models.Votes.post_id, isouter=True).group_by(models.Post.id).filter(
+        models.Post.title.contains(search)).limit(limit).offset(skip).all()
+
+    return results
 
 
     # cursor.execute(""" SELECT * FROM posts""")
     # posts = cursor.fetchall()
     # return {'All_Posts': posts}
-
 
 @router.post('/', status_code=status.HTTP_201_CREATED,response_model= schemas.PostResponse)
 def create_post(post: schemas.PostCreate, db: Session = Depends(get_db),get_current_user:int = Depends(Oauth2.get_current_user)):
@@ -55,11 +62,13 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db),get_curr
 #     return {'lates_post':post}
 
 
-@router.get('/{id}', response_model= schemas.PostResponse)
+@router.get('/{id}', response_model= schemas.PostOut)
 def get_post(id: int, db: Session = Depends(get_db),get_current_user:int = Depends(Oauth2.get_current_user)):
 # Updated code using ORM instead if direct db server
 
-    post_by_id = db.query(models.Post).filter(models.Post.id == str(id)).first()
+    #post_by_id = db.query(models.Post).filter(models.Post.id == str(id)).first()
+    post_by_id = db.query(models.Post, func.count(models.Votes.post_id).label('votes')).join(
+        models.Votes, models.Post.id == models.Votes.post_id, isouter=True).group_by(models.Post.id).filter(models.Post.id == str(id)).first()
     if not post_by_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Post with id:{id} not found')
     return  post_by_id

@@ -42,7 +42,11 @@ class PostResponse(PostBase):
     class Config:
         orm_mode = True
 
-
+class PostOut(BAs):
+    post: PostResponse
+    votes: int
+    class Config:
+        orm_mode = True
 
 class Token(BaseModel):
     access_token: str
